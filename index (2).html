@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Name — Developer</title>
+<style>
+  :root{
+    --bg:#0d0d10;
+    --bg-raised:#151519;
+    --ink:#e9e7e2;
+    --ink-dim:#8a8a92;
+    --line:#26262c;
+    --accent:#e0a548;
+    --accent-dim:#8a6a34;
+    --tag-text:#78a9ff;
+    --tag-bg:rgba(120, 169, 255, 0.08);
+    --tag-border:rgba(120, 169, 255, 0.2);
+    --mono: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+    --sans: 'Inter', -apple-system, sans-serif;
+  }
+  html[data-theme="light"]{
+    --bg:#faf9f5;
+    --bg-raised:#ffffff;
+    --ink:#1a1a1d;
+    --ink-dim:#65656f;
+    --line:#e2e0d8;
+    --accent:#b5701f;
+    --accent-dim:#e6c68f;
+    --tag-text:#2f5c96;
+    --tag-bg:rgba(47, 92, 150, 0.06);
+    --tag-border:rgba(47, 92, 150, 0.18);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    transition:background-color .25s ease, color .25s ease;
+  }
+  a{color:inherit;}
+  ::selection{background:var(--accent);color:var(--bg);}
+
+  .wrap{max-width:760px;margin:0 auto;padding:0 24px;}
+
+  /* THEME TOGGLE */
+  .theme-toggle{
+    position:fixed;
+    top:20px;
+    right:20px;
+    z-index:10;
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    border:1px solid var(--line);
+    background:var(--bg-raised);
+    color:var(--ink);
+    font-size:16px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:border-color .2s ease, transform .2s ease, background-color .25s ease;
+  }
+  .theme-toggle:hover{
+    border-color:var(--accent);
+    transform:scale(1.08) rotate(12deg);
+  }
+
+  /* HERO */
+  header.hero{
+    padding:96px 0 64px;
+    border-bottom:1px solid var(--line);
+  }
+  .prompt{
+    font-family:var(--mono);
+    color:var(--accent);
+    font-size:14px;
+    margin-bottom:20px;
+    letter-spacing:0.02em;
+  }
+  .prompt .cursor{
+    display:inline-block;
+    width:8px;height:16px;
+    background:var(--accent);
+    margin-left:2px;
+    vertical-align:-2px;
+    animation:blink 1.1s steps(1) infinite;
+  }
+  @keyframes blink{50%{opacity:0;}}
+  h1{
+    font-size:clamp(32px,6vw,52px);
+    font-weight:700;
+    letter-spacing:-0.02em;
+    margin-bottom:10px;
+    background:linear-gradient(90deg, var(--ink) 0%, var(--ink) 70%, var(--accent) 100%);
+    -webkit-background-clip:text;
+    background-clip:text;
+  }
+  .role{
+    font-family:var(--mono);
+    color:var(--ink-dim);
+    font-size:16px;
+  }
+  .bio{
+    margin-top:24px;
+    max-width:52ch;
+    color:var(--ink-dim);
+    font-size:16px;
+  }
+  .links{
+    margin-top:32px;
+    display:flex;
+    gap:28px;
+    flex-wrap:wrap;
+    font-family:var(--mono);
+    font-size:14px;
+  }
+  .link-item{
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+  }
+  .link-label{
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.1em;
+    color:var(--ink-dim);
+  }
+  .links a{
+    position:relative;
+    color:var(--ink);
+    text-decoration:none;
+    padding-bottom:3px;
+    transition:color .2s ease;
+    width:fit-content;
+  }
+  .links a::after{
+    content:'';
+    position:absolute;
+    left:0;bottom:0;
+    width:100%;
+    height:1px;
+    background:var(--line);
+    transform:scaleX(1);
+    transform-origin:left;
+  }
+  .links a::before{
+    content:'';
+    position:absolute;
+    left:0;bottom:0;
+    width:100%;
+    height:2px;
+    background:var(--accent);
+    transform:scaleX(0);
+    transform-origin:left;
+    transition:transform .25s ease;
+  }
+  .links a:hover{color:var(--accent);}
+  .links a:hover::before{transform:scaleX(1);}
+
+  /* SECTION LABEL */
+  .section-label{
+    font-family:var(--sans);
+    font-size:28px;
+    font-weight:800;
+    color:var(--accent);
+    letter-spacing:-0.01em;
+    text-transform:none;
+    margin:44px 0 28px;
+    display:flex;
+    align-items:center;
+    gap:16px;
+  }
+  .section-label::before{
+    content:'';
+    flex:0 0 6px;
+    width:6px;
+    height:28px;
+    border-radius:2px;
+    background:var(--accent);
+  }
+  .section-label::after{
+    content:'';
+    flex:1;
+    height:1px;
+    background:linear-gradient(90deg, var(--line) 0%, transparent 100%);
+  }
+
+  /* PROJECTS — git log style */
+  .log{
+    border-left:2px solid var(--line);
+  }
+  .commit{
+    position:relative;
+    padding:16px 16px 40px 28px;
+    margin-left:-16px;
+    border-radius:8px;
+    transition:background-color .2s ease, transform .2s ease;
+  }
+  .commit:hover{
+    background:var(--bg-raised);
+    transform:translateX(4px);
+  }
+  .commit:last-child{padding-bottom:16px;}
+  .commit::before{
+    content:'';
+    position:absolute;
+    left:7px;
+    top:22px;
+    width:12px;height:12px;
+    border-radius:50%;
+    background:var(--bg);
+    border:2px solid var(--accent);
+    transition:box-shadow .2s ease, background-color .2s ease;
+  }
+  .commit:hover::before{
+    box-shadow:0 0 0 4px color-mix(in srgb, var(--accent) 25%, transparent);
+  }
+  .commit-meta{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--accent-dim);
+    margin-bottom:8px;
+  }
+  .commit-meta .hash{color:var(--accent);}
+  .commit h3{
+    font-size:20px;
+    font-weight:700;
+    margin-bottom:8px;
+    letter-spacing:-0.01em;
+  }
+  .commit p{
+    color:var(--ink-dim);
+    font-size:15px;
+    max-width:58ch;
+    margin-bottom:12px;
+  }
+  .tags{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:12px;
+  }
+  .tag{
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--tag-text);
+    background:var(--tag-bg);
+    border:1px solid var(--tag-border);
+    padding:3px 8px;
+    border-radius:3px;
+    transition:background-color .15s ease, color .15s ease, border-color .15s ease, transform .15s ease;
+  }
+  .tag:hover{
+    background:var(--tag-text);
+    color:var(--bg);
+    border-color:var(--tag-text);
+    transform:translateY(-2px);
+  }
+  .commit-links{
+    font-family:var(--mono);
+    font-size:13px;
+    display:flex;
+    gap:16px;
+  }
+  .commit-links a{
+    color:var(--accent);
+    text-decoration:none;
+    transition:transform .15s ease, opacity .15s ease;
+    display:inline-block;
+  }
+  .commit-links a:hover{
+    transform:translateX(3px);
+    text-decoration:underline;
+  }
+
+  /* FOOTER */
+  footer{
+    margin-top:80px;
+    padding:32px 0 64px;
+    border-top:1px solid var(--line);
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--ink-dim);
+    display:flex;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+
+  @media (max-width:480px){
+    header.hero{padding:64px 0 40px;}
+    .section-label{margin:48px 0 20px;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .cursor{animation:none;}
+  }
+
+  :focus-visible{
+    outline:2px solid var(--accent);
+    outline-offset:3px;
+  }
+
+  /* EDUCATION & LEARNING */
+  .edu-card, .learning-card{
+    border:1px solid var(--line);
+    background:var(--bg-raised);
+    border-radius:6px;
+    padding:24px;
+    transition:border-color .2s ease, transform .2s ease, box-shadow .2s ease;
+  }
+  .edu-card:hover, .learning-card:hover{
+    border-color:var(--accent);
+    transform:translateY(-3px);
+    box-shadow:0 8px 24px rgba(0,0,0,0.12);
+  }
+  .edu-card .school{
+    font-size:18px;
+    font-weight:700;
+    margin-bottom:6px;
+  }
+  .edu-card .degree{
+    color:var(--ink-dim);
+    font-size:15px;
+    margin-bottom:4px;
+  }
+  .edu-card .meta{
+    font-family:var(--mono);
+    font-size:13px;
+    color:var(--accent);
+  }
+
+  /* HACKATHONS */
+  .hack-card{
+    border:1px solid var(--line);
+    background:var(--bg-raised);
+    border-radius:6px;
+    padding:20px;
+    transition:border-color .2s ease, transform .2s ease, box-shadow .2s ease;
+  }
+  .hack-card:hover{
+    border-color:var(--accent);
+    transform:translateY(-3px);
+    box-shadow:0 8px 24px rgba(0,0,0,0.12);
+  }
+  .hack-gallery{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:10px;
+    margin-bottom:18px;
+  }
+  .hack-photo{
+    aspect-ratio:1;
+    border-radius:6px;
+    background:
+      linear-gradient(135deg, var(--line) 0%, var(--bg-raised) 100%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:var(--mono);
+    font-size:11px;
+    color:var(--ink-dim);
+    text-align:center;
+    padding:8px;
+    border:1px solid var(--line);
+    background-size:cover;
+    background-position:center;
+    transition:transform .2s ease, border-color .2s ease;
+  }
+  .hack-photo:hover{
+    transform:scale(1.03);
+    border-color:var(--accent);
+  }
+  .hack-photo img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    border-radius:6px;
+    display:block;
+  }
+  .hack-photo span{
+    background:rgba(13,13,16,0.75);
+    padding:4px 8px;
+    border-radius:3px;
+  }
+  .hack-info h3{
+    font-size:18px;
+    font-weight:700;
+    margin-bottom:6px;
+  }
+  .hack-info .hack-meta{
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--accent);
+    margin-bottom:10px;
+  }
+  .hack-info p{
+    color:var(--ink-dim);
+    font-size:14px;
+    max-width:52ch;
+    margin-bottom:8px;
+  }
+  .hack-result{
+    display:inline-block;
+    font-family:var(--mono);
+    font-size:12px;
+    color:var(--accent);
+    border:1px solid var(--accent-dim);
+    padding:3px 10px;
+    border-radius:3px;
+  }
+  @media (max-width:480px){
+    .hack-gallery{grid-template-columns:1fr;}
+  }
+
+  /* CERTIFICATIONS */
+  .cert-list{
+    list-style:none;
+  }
+  .cert-list li{
+    display:flex;
+    align-items:baseline;
+    gap:12px;
+    padding:12px 8px;
+    margin:0 -8px;
+    border-radius:4px;
+    border-bottom:1px solid var(--line);
+    font-size:14px;
+    transition:background-color .15s ease, transform .15s ease;
+  }
+  .cert-list li:hover{
+    background:var(--bg-raised);
+    transform:translateX(4px);
+  }
+  .cert-list li:last-child{border-bottom:none;}
+  .cert-list .cert-hash{
+    font-family:var(--mono);
+    color:var(--accent);
+    font-size:12px;
+    flex:0 0 auto;
+  }
+  .cert-list .cert-name{color:var(--ink);}
+  .cert-list .cert-year{
+    font-family:var(--mono);
+    color:var(--ink-dim);
+    font-size:12px;
+    margin-left:auto;
+  }
+  .cert-badge{
+    font-family:var(--mono);
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--accent);
+    border:1px solid var(--accent-dim);
+    padding:2px 8px;
+    border-radius:3px;
+    margin-left:auto;
+    flex:0 0 auto;
+  }
+
+  /* LEARNING NOW */
+  .now-line{
+    font-family:var(--mono);
+    font-size:14px;
+    color:var(--ink-dim);
+    margin-top:16px;
+    margin-bottom:8px;
+  }
+  .now-line .now-dot{
+    display:inline-block;
+    width:8px;height:8px;
+    border-radius:50%;
+    background:var(--accent);
+    margin-right:8px;
+    animation:pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{opacity:1;}
+    50%{opacity:0.35;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .now-dot{animation:none;}
+  }
+
+  /* CLOSING NOTE */
+  .closing-note{
+    font-size:14px;
+    color:var(--ink-dim);
+    border-left:2px solid var(--accent-dim);
+    padding-left:16px;
+    max-width:56ch;
+    transition:border-color .2s ease, padding-left .2s ease;
+  }
+  .closing-note:hover{
+    border-left-color:var(--accent);
+    padding-left:22px;
+  }
+  .closing-note strong{color:var(--ink);}
+</style>
+</head>
+<body>
+
+<button class="theme-toggle" id="themeToggle" aria-label="Toggle light and dark mode">🌙</button>
+
+<div class="wrap">
+
+  <header class="hero">
+    <div class="prompt">~/portfolio $ whoami<span class="cursor"></span></div>
+    <h1>Aswithaa B</h1>
+    <div class="role">Computer Science Undergraduate</div>
+    <p class="bio">
+      I build AI-powered and full-stack web applications —Thrives on ownership - taking projects from concept to completion and brings the discipline of a decade of competitive 
+training into every technical challenge. 
+ Currently exploring new projects
+      and open to opportunities.
+    </p>
+    <div class="links">
+      <div class="link-item">
+        <span class="link-label">Email</span>
+        <a href="mailto:aswithaa17@gmail.com">aswithaa17@gmail.com</a>
+      </div>
+      <div class="link-item">
+        <span class="link-label">GitHub</span>
+        <a href="https://github.com/Aswi7" target="_blank" rel="noopener">github.com/Aswi7</a>
+      </div>
+      <div class="link-item">
+        <span class="link-label">LinkedIn</span>
+        <a href="https://www.linkedin.com/in/aswithaa07" target="_blank" rel="noopener">in/aswithaa07</a>
+      </div>
+      <div class="link-item">
+        <span class="link-label">LeetCode</span>
+        <a href="https://leetcode.com/u/Aswitha_7" target="_blank" rel="noopener">u/Aswitha_7</a>
+      </div>
+      <div class="link-item">
+        <span class="link-label">Resume</span>
+        <a href="Aswithaa_B_Resume_Clg.pdf" target="_blank" rel="noopener">Open Resume</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="section-label">Selected Work</div>
+
+    <div class="log">
+
+      <article class="commit">
+        <div class="commit-meta"><span class="hash">a3f9c1e</span> · 2026</div>
+        <h3>Multilingual Lecture Assistant</h3>
+        <p>An AI-powered application that converts lecture audio into structured study materials — transcribing multilingual lectures, generating summaries, extracting keywords, creating exam-oriented questions, translating content into regional languages, and exporting notes in multiple formats.</p>
+        <div class="tags">
+          <span class="tag">React</span>
+          <span class="tag">Tailwind CSS</span>
+          <span class="tag">Flask</span>
+          <span class="tag">MongoDB</span>
+          <span class="tag">Whisper</span>
+          <span class="tag">spaCy</span>
+        </div>
+        <div class="commit-links">
+          <a href="https://github.com/Aswi7/LECTA-AI" target="_blank" rel="noopener">source →</a>
+        </div>
+      </article>
+
+      <article class="commit">
+        <div class="commit-meta"><span class="hash">7b2e0d4</span> · 2025</div>
+        <h3>Industry Mentor Portal</h3>
+        <p>A scalable, full-stack mentoring platform (MERN) connecting mentors, mentees, and admins — with secure JWT-based authentication, role-based access control across three distinct user roles, and RESTful APIs for session scheduling and feedback management.</p>
+        <div class="tags">
+          <span class="tag">React.js</span>
+          <span class="tag">Node.js</span>
+          <span class="tag">Express.js</span>
+          <span class="tag">MongoDB</span>
+          <span class="tag">JWT</span>
+        </div>
+        <div class="commit-links">
+          <a href="https://github.com/Aswi7/industry-mentor-portal" target="_blank" rel="noopener">source →</a>
+        </div>
+      </article>
+
+      </article>
+
+    </div>
+
+    <div class="section-label">Contributions</div>
+    <div class="log">
+      <article class="commit">
+        <div class="commit-meta"><span class="hash">3b7e0b4</span> · 2026</div>
+        <h3>Smart Health Management System</h3>
+        <p>AI-powered disease outbreak prediction and real-time health monitoring system for rural and tribal communities. Early warning system with predictive analytics...</p>
+        <div class="tags">
+          <span class="tag">Python</span>
+          <span class="tag">Machine Learning</span>
+          <span class="tag">Predictive Analytics</span>
+        </div>
+        <div class="commit-links">
+          <a href="https://github.com/SharveshRamchandani/WaterDiseaseDetector" target="_blank" rel="noopener">source →</a>
+        </div>
+      </article>
+    </div>
+
+    <div class="section-label">Current Learning</div>
+    <div class="learning-card">
+      <div class="now-line" style="margin-top:0;"><span class="now-dot"></span>Currently learning: Cloud Computing</div>
+    </div>
+
+    <div class="section-label">Education</div>
+    <div class="edu-card">
+      <div class="school">Bannari Amman Institute of Technology, Sathyamangalam</div>
+      <div class="degree">B.E. Computer Science</div>
+      <div class="meta">Final Year · CGPA 8.25</div>
+    </div>
+
+    <div class="section-label">Hackathons</div>
+    <div class="hack-card">
+      <div class="hack-gallery">
+        <div class="hack-photo">
+          <img src="hackathon-photo-1.jpeg" alt="Hackathon team photo 1" loading="lazy">
+        </div>
+        <div class="hack-photo">
+          <img src="hackathon-photo-2.jpeg" alt="Hackathon team photo 2" loading="lazy">
+        </div>
+      </div>
+      <div class="hack-info">
+        <h3>HACK-AI-THON'25</h3>
+        <div class="hack-meta">St. Joseph's College, Shollinganallur, Chennai</div>
+        <p>Built the Industry Mentor Portal — a full-stack mentoring platform with role-based access and session management.</p>
+        <span class="hack-result">Finalist · Top 75 of 2800 teams</span>
+      </div>
+    </div>
+
+    <div class="section-label">Certifications</div>
+    <ul class="cert-list">
+      <li>
+        <span class="cert-hash">◐</span>
+        <span class="cert-name">WiproNextWave — Database Solutions Expert</span>
+        <span class="cert-badge">In Progress</span>
+      </li>
+      <li>
+        <span class="cert-hash">◐</span>
+        <span class="cert-name">SAP</span>
+        <span class="cert-badge">In Progress</span>
+      </li>
+      <li>
+        <span class="cert-hash">✓</span>
+        <span class="cert-name">Oracle Cloud Infrastructure 2025 Certified AI Foundations Associate</span>
+        <span class="cert-year">2025</span>
+      </li>
+      <li>
+        <span class="cert-hash">✓</span>
+        <span class="cert-name">NPTEL — Ethical Hacking</span>
+        <span class="cert-year">2025</span>
+      </li>
+      <li>
+        <span class="cert-hash">✓</span>
+        <span class="cert-name">NPTEL — The Joy of Computing Using Python</span>
+        <span class="cert-year">2026</span>
+      </li>
+      <li>
+        <span class="cert-hash">✓</span>
+        <span class="cert-name">TCS iON Career Edge — Young Professional</span>
+        <span class="cert-year"></span>
+      </li>
+      <li>
+        <span class="cert-hash">✓</span>
+        <span class="cert-name">Cisco–IBM SkillsBuild — AI Fundamentals &amp; Networking Basics</span>
+        <span class="cert-year"></span>
+      </li>
+    </ul>
+
+    <div class="section-label">Beyond the Code</div>
+    <p class="closing-note">
+      <strong>Karate,Black belt, 10 years of martial arts training</strong> — competed at state and national level,
+      placing 3rd nationally, and coached junior batches along the way. It's where the discipline and
+      composure under pressure that shows up in my work actually comes from.
+    </p>
+  </main>
+
+  <footer>
+    <span>© 2026 Aswithaa B</span>
+  </footer>
+
+</div>
+
+<script>
+  var toggle = document.getElementById('themeToggle');
+  var root = document.documentElement;
+  var theme = 'dark';
+  toggle.addEventListener('click', function(){
+    theme = (theme === 'dark') ? 'light' : 'dark';
+    root.setAttribute('data-theme', theme);
+    toggle.textContent = (theme === 'dark') ? '🌙' : '☀️';
+  });
+</script>
+
+</body>
+</html>
